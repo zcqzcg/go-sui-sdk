@@ -100,6 +100,46 @@ func (c *Client) CallContext(ctx context.Context, result interface{}, method Met
 	return json.Unmarshal(respmsg.Result, result)
 }
 
+// CallContext performs a JSON-RPC call with the given arguments. If the context is
+// canceled before the call has successfully returned, CallContext returns immediately.
+//
+// The result must be a pointer so that package json can unmarshal into it. You
+// can also pass nil, in which case the result is ignored.
+func (c *Client) CallContextWithoutUnmarshal(ctx context.Context, result interface{}, method Method, args ...interface{}) error {
+	if result != nil && reflect.TypeOf(result).Kind() != reflect.Ptr {
+		return fmt.Errorf("call result parameter must be pointer or nil interface: %v", result)
+	}
+	msg, err := c.newMessage(method.String(), args...)
+	if err != nil {
+		return err
+	}
+	respBody, err := c.doRequest(ctx, msg)
+	if err != nil {
+		return err
+	}
+	defer respBody.Close()
+	decoder := json.NewDecoder(respBody)
+	decoder1 := decoder
+	bf, err := io.ReadAll(decoder1.Buffered())
+	if err != nil {
+		return err
+	}
+	var respmsg jsonrpcMessage
+	if len(bf) == 0 {
+		return nil
+	}
+	if err := decoder.Decode(&respmsg); err != nil {
+		return err
+	}
+	if respmsg.Error != nil {
+		return respmsg.Error
+	}
+	if len(respmsg.Result) == 0 {
+		return ErrNoResult
+	}
+	return json.Unmarshal(respmsg.Result, result)
+}
+
 // BatchCall sends all given requests as a single batch and waits for the server
 // to return a response for all of them.
 func (c *Client) BatchCall(b []BatchElem) error {
