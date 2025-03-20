@@ -757,7 +757,7 @@ func TestClient_MultiGetTransactionBlocks(t *testing.T) {
 
 	transactionBlocks, err := chain.MultiGetTransactionBlocks(
 		context.Background(),
-		digests,
+		digestStrs,
 		types.SuiTransactionBlockResponseOptions{ShowEffects: true, ShowEvents: true},
 	)
 	require.NoError(t, err)

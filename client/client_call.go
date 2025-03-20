@@ -95,7 +95,7 @@ func (c *Client) MultiGetObjects(
 
 func (c *Client) MultiGetTransactionBlocks(
 	ctx context.Context,
-	digests []suiDigest,
+	digests []string,
 	options types.SuiTransactionBlockResponseOptions,
 ) ([]types.SuiTransactionBlockResponse, error) {
 	var resp []types.SuiTransactionBlockResponse
