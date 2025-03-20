@@ -93,6 +93,15 @@ func (c *Client) MultiGetObjects(
 	return resp, c.CallContext(ctx, &resp, multiGetObjects, objIDs, options)
 }
 
+func (c *Client) MultiGetTransactionBlocks(
+	ctx context.Context,
+	digests []suiDigest,
+	options types.SuiTransactionBlockResponseOptions,
+) ([]types.SuiTransactionBlockResponse, error) {
+	var resp []types.SuiTransactionBlockResponse
+	return resp, c.CallContext(ctx, &resp, multiGetTransactionBlocks, digests, options)
+}
+
 // address : <SuiAddress> - the owner's Sui address
 // query : <ObjectResponseQuery> - the objects query criteria.
 // cursor : <CheckpointedObjectID> - An optional paging cursor. If provided, the query will start from the next item after the specified cursor. Default to start from the first item if not specified.
@@ -397,8 +406,10 @@ func (c *Client) ResolveNameServiceAddress(ctx context.Context, suiName string) 
 	return &resp, nil
 }
 
-func (c *Client) ResolveNameServiceNames(ctx context.Context,
-	owner suiAddress, cursor *suiObjectID, limit *uint) (*types.SuiNamePage, error) {
+func (c *Client) ResolveNameServiceNames(
+	ctx context.Context,
+	owner suiAddress, cursor *suiObjectID, limit *uint,
+) (*types.SuiNamePage, error) {
 	var resp types.SuiNamePage
 	return &resp, c.CallContext(ctx, &resp, resolveNameServiceNames, owner, cursor, limit)
 }

@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-//func TestClient_BatchGetTransaction(t *testing.T) {
+// func TestClient_BatchGetTransaction(t *testing.T) {
 //	chain := ChainClient(t)
 //	coins, err := chain.GetCoins(context.TODO(), *Address, nil, nil, 1)
 //	require.NoError(t, err)
@@ -53,7 +53,7 @@ import (
 //			t.Logf("%+v", got)
 //		})
 //	}
-//}
+// }
 
 func Test_TagJson_Owner(t *testing.T) {
 	test := func(str string) lib.TagJson[sui_types.Owner] {
@@ -105,7 +105,7 @@ func TestClient_DryRunTransaction(t *testing.T) {
 // TestClient_ExecuteTransactionSerializedSig
 // This test case will affect the real coin in the test case of account
 // temporary disabled
-//func TestClient_ExecuteTransactionSerializedSig(t *testing.T) {
+// func TestClient_ExecuteTransactionSerializedSig(t *testing.T) {
 //	chain := ChainClient(t)
 //	coins, err := chain.GetSuiCoinsOwnedByAddress(context.TODO(), *Address)
 //	require.NoError(t, err)
@@ -118,9 +118,9 @@ func TestClient_DryRunTransaction(t *testing.T) {
 //	txResult, err := chain.ExecuteTransactionSerializedSig(context.TODO(), *signedTx, types.TxnRequestTypeWaitForEffectsCert)
 //	require.NoError(t, err)
 //	t.Logf("%#v", txResult)
-//}
+// }
 
-//func TestClient_ExecuteTransaction(t *testing.T) {
+// func TestClient_ExecuteTransaction(t *testing.T) {
 //	chain := ChainClient(t)
 //	coins, err := chain.GetSuiCoinsOwnedByAddress(context.TODO(), *Address)
 //	require.NoError(t, err)
@@ -133,7 +133,7 @@ func TestClient_DryRunTransaction(t *testing.T) {
 //	txResult, err := chain.ExecuteTransaction(context.TODO(), *signedTx, types.TxnRequestTypeWaitForEffectsCert)
 //	require.NoError(t, err)
 //	t.Logf("%#v", txResult)
-//}
+// }
 
 func TestClient_BatchGetObjectsOwnedByAddress(t *testing.T) {
 	cli := ChainClient(t)
@@ -425,7 +425,7 @@ func TestClient_GetLatestCheckpointSequenceNumber(t *testing.T) {
 	t.Log(res)
 }
 
-//func TestClient_Publish(t *testing.T) {
+// func TestClient_Publish(t *testing.T) {
 //	chain := ChainClient(t)
 //	dmens, err := types.NewBase64Data(DmensDmensB64)
 //	require.NoError(t, err)
@@ -479,7 +479,7 @@ func TestClient_GetLatestCheckpointSequenceNumber(t *testing.T) {
 //			t.Logf("%#v", txResult)
 //		})
 //	}
-//}
+// }
 
 func TestClient_TryGetPastObject(t *testing.T) {
 	cli := ChainClient(t)
@@ -738,4 +738,28 @@ func TestClient_GetDynamicFieldObject(t *testing.T) {
 			},
 		)
 	}
+}
+
+func TestClient_MultiGetTransactionBlocks(t *testing.T) {
+	chain := MainnetClient(t)
+	digestStrs := []string{
+		"3mGTQM3sFvh8Bes3aJtwYavaM1sJcd4k7EY3HfCJmMPV",
+		"9CxR2RUJ4usbzWVysgBLv8P4pigmRUdcxNRfudKLLjZD",
+		"GhP3TaUgyigi1GgJAoUywqQweA2wBHJ1sU1A2nmjQe76",
+		"6DfNjUWvmWT3jAHMTzMwpGT1N8xDX65M8gFGjvkFR7uR",
+	}
+	var digests []suiDigest
+	for _, digestStr := range digestStrs {
+		digest, err := sui_types.NewDigest(digestStr)
+		require.NoError(t, err)
+		digests = append(digests, *digest)
+	}
+
+	transactionBlocks, err := chain.MultiGetTransactionBlocks(
+		context.Background(),
+		digests,
+		types.SuiTransactionBlockResponseOptions{ShowEffects: true, ShowEvents: true},
+	)
+	require.NoError(t, err)
+	t.Logf("%#v", transactionBlocks)
 }
